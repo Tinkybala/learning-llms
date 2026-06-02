@@ -27,3 +27,7 @@ parameters:
     - https://lilianweng.github.io/posts/2021-05-31-contrastive/
     - https://lilianweng.github.io/posts/2021-03-21-lm-toxicity/
     - https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/
+
+    # Github Repos
+    - https://github.com/lilianweng/stock-rnn
+    - https://github.com/lilianweng/multi-armed-bandit
