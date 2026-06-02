@@ -1,0 +1,4 @@
+# authors that we want to populate the feature store with
+parameters:
+  author_full_names:
+    - Lilian Weng
