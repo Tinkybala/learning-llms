@@ -1,5 +1,10 @@
 import logging
 
+from data_engineering.feature_engineering.handlers.cleaning_handlers import (
+    CleaningDataHandler,
+    CustomArticleCleaningHandler,
+    RepositoryCleaningHandler,
+)
 from data_engineering.feature_engineering.vector import VectorBaseDocument
 from data_engineering.pipelines.ODM.base.nosql import NoSQLBaseDocument
 from data_engineering.pipelines.ODM.types import DataCategory
@@ -17,6 +22,7 @@ class CleaningHandlerFactory:
         else:
             raise ValueError("Unsupported data type")
 
+
 class CleaningDispatcher:
     cleaning_factory = CleaningHandlerFactory
 
@@ -26,12 +32,5 @@ class CleaningDispatcher:
         handler = cls.cleaning_factory.create_handler(data_category)
         clean_model = handler.clean(data_model)
 
-        logging.info(
-            "data cleaned successfully."
-        )
+        logging.info("data cleaned successfully.")
         return clean_model
-
-
-
-    
-

@@ -1,5 +1,11 @@
 import logging
 
+from feature_engineering.handlers.chunking_handlers import (
+    ChunkingDataHandler,
+    CustomArticleChunkingHandler,
+    RepositoryChunkingHandler,
+)
+
 from data_engineering.feature_engineering.vector import VectorBaseDocument
 from data_engineering.pipelines.ODM.base.nosql import NoSQLBaseDocument
 from data_engineering.pipelines.ODM.types import DataCategory
@@ -28,4 +34,3 @@ class ChunkingDispatcher:
         chunk_models = handler.chunk(data_model)
         logging.info("Document chunked successfully")
         return chunk_models
-    

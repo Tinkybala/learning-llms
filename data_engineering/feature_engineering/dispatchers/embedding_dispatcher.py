@@ -5,6 +5,7 @@ from data_engineering.pipelines.ODM.types import DataCategory
 
 logging.basicConfig(level=logging.INFO)
 
+
 class EmbeddingHandlerFactory:
     @staticmethod
     def create_handler(data_category: DataCategory) -> EmbeddingDataHandler:
