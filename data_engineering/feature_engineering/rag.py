@@ -1,30 +1,34 @@
 """
 Performs chunking and embedding of cleaned documents
 """
+
 from typing_extensions import Annotated
 
-from data_engineering.feature_engineering.chunking_dispatcher import ChunkingDispatcher
-from data_engineering.feature_engineering.embedding_dispatcher import (
+from data_engineering.feature_engineering.dispatchers.chunking_dispatcher import (
+    ChunkingDispatcher,
+)
+from data_engineering.feature_engineering.dispatchers.embedding_dispatcher import (
     EmbeddingDispatcher,
 )
 from data_engineering.utils import batch
 
 
 def chunk_and_embed(
-        cleaned_documents: Annotated[list, "cleaned_documents"],
+    cleaned_documents: Annotated[list, "cleaned_documents"],
 ) -> Annotated[list, "chunked_documents"]:
-    #metadata = {"chunking": {}, "embedding": {}, "num_documents": len(cleaned_documents)}
+    # metadata = {"chunking": {}, "embedding": {}, "num_documents": len(cleaned_documents)}
 
     embedded_chunks = []
     for document in cleaned_documents:
         chunks = ChunkingDispatcher.dispatch(document)
-        #metadata["chunking"] = _add_chunks_metadata(chunks, metadata["chunking"])
+        # metadata["chunking"] = _add_chunks_metadata(chunks, metadata["chunking"])
 
         for batched_chunks in batch(chunks, 10):
             batched_embedded_chunks = EmbeddingDispatcher.dispatch(batched_chunks)
             embedded_chunks.extend(batched_embedded_chunks)
-    
+
     return embedded_chunks
+
 
 # def _add_chunks_metadata(chunks: list[Chunk], metadata: dict) -> dict:
 #     for chunk in chunks:
