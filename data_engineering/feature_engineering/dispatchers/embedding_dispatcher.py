@@ -1,5 +1,11 @@
 import logging
 
+from data_engineering.feature_engineering.handlers.embedding_handlers import (
+    CustomArticleEmbeddingHandler,
+    EmbeddingDataHandler,
+    QueryEmbeddingHandler,
+    RepositoryEmbeddingHandler,
+)
 from data_engineering.feature_engineering.vector import VectorBaseDocument
 from data_engineering.pipelines.ODM.types import DataCategory
 
@@ -12,7 +18,7 @@ class EmbeddingHandlerFactory:
         if data_category == DataCategory.QUERIES:
             return QueryEmbeddingHandler()
         elif data_category == DataCategory.ARTICLES:
-            return ArticleEmbeddingHandler()
+            return CustomArticleEmbeddingHandler()
         elif data_category == DataCategory.REPOSITORIES:
             return RepositoryEmbeddingHandler()
         else:
@@ -44,9 +50,9 @@ class EmbeddingDispatcher:
         if not is_list:
             embedded_chunk_model = embedded_chunk_model[0]
 
-        logger.info(
+        logging.info(
             "Data embedded successfully.",
-            data_category=data_category,
+            #data_category=data_category,
         )
 
         return embedded_chunk_model

@@ -5,15 +5,19 @@ Base class for Vector Embedding OVM
 import logging
 import uuid
 from abc import ABC
-from typing import Generic, Type, TypeVar
+from typing import Any, Callable, Dict, Generic, Type, TypeVar
 from uuid import UUID
 
 import numpy as np
 from pydantic import UUID4, BaseModel, Field
 from qdrant_client.http import exceptions
+from qdrant_client.http.models import Distance, VectorParams
 from qdrant_client.models import PointStruct, Record
 
 from data_engineering.exceptions import ImproperlyConfigured
+from data_engineering.feature_engineering.qdrant import connection
+from data_engineering.pipelines.ODM.types import DataCategory
+from models.embedding import EmbeddingModelSingleton
 
 T = TypeVar("T", bound="VectorBaseDocument")
 
@@ -53,8 +57,20 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
         return PointStruct(id=_id, vector=vector, payload=payload)
 
     @classmethod
-    def group_by_class(documents) -> dict[T, list]:
-        raise NotImplementedError
+    def group_by_class(cls: Type["VectorBaseDocument"], documents: list["VectorBaseDocument"]) -> Dict["VectorBaseDocument", list["VectorBaseDocument"]]:
+        return cls._group_by(documents, selector=lambda doc: doc.__class__)
+    
+    @classmethod
+    def _group_by(cls: Type[T], documents: list[T], selector: Callable[[T], Any]) -> Dict[Any, list[T]]:
+        grouped = {}
+        for doc in documents:
+            key = selector(doc)
+
+            if key not in grouped:
+                grouped[key] = []
+            grouped[key].append(doc)
+
+        return grouped
 
     @classmethod
     def bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> bool:
@@ -69,27 +85,35 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
             try:
                 cls._bulk_insert(documents)
             except exceptions.UnexpectedResponse:
-                logging.error(f"Failed to insert documents in '{cls.get_collection_name()}'.")
+                logging.error(
+                    f"Failed to insert documents in '{cls.get_collection_name()}'."
+                )
                 return False
         return True
-    
+
     @classmethod
     def _bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> None:
         points = [doc.to_point() for doc in documents]
         connection.upsert(collection_name=cls.get_collection_name(), points=points)
-    
+
     @classmethod
-    def bulk_find(cls: Type[T], limit: int = 10, **kwargs) -> tuple[list[T], UUID | None]:
+    def bulk_find(
+        cls: Type[T], limit: int = 10, **kwargs
+    ) -> tuple[list[T], UUID | None]:
         try:
             documents, next_offset = cls._bulk_find(limit=limit, **kwargs)
         except exceptions.UnexpectedResponse:
-            logging.info(f"Failed to search documents in '{cls.get_collection_name()}'.")
+            logging.info(
+                f"Failed to search documents in '{cls.get_collection_name()}'."
+            )
             documents, next_offset = [], None
 
         return documents, next_offset
 
     @classmethod
-    def _bulk_find(cls: Type[T], limit: int = 10, **kwargs) -> tuple[list[T], UUID | None]:
+    def _bulk_find(
+        cls: Type[T], limit: int = 10, **kwargs
+    ) -> tuple[list[T], UUID | None]:
         collection_name = cls.get_collection_name()
 
         offset = kwargs.pop("offset", None)
@@ -101,7 +125,7 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
             with_payload=kwargs.pop("with_payload", True),
             with_vectors=kwargs.pop("with_vectors", False),
             offset=offset,
-            **kwargs
+            **kwargs,
         )
 
         documents = [cls.from_record(record) for record in records]
@@ -115,7 +139,9 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
         try:
             documents = cls._search(query_vector=query_vector, limit=limit, **kwargs)
         except exceptions.UnexpectedResponse:
-            logging.error(f"Failed to search documents in '{cls.get_collection_name()}'")
+            logging.error(
+                f"Failed to search documents in '{cls.get_collection_name()}'"
+            )
             documents = []
         return documents
 
@@ -132,7 +158,7 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
         )
         documents = [cls.from_record(record) for record in records]
         return documents
-    
+
     @classmethod
     def get_collection_name(cls: Type[T]) -> str:
         if not hasattr(cls, "Config") or not hasattr(cls.Config, "name"):
@@ -140,3 +166,35 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
                 "The class should define a Config class with the 'name' property that reflects the collection's name"
             )
         return cls.Config.name
+
+    @classmethod
+    def get_category(cls: Type[T]) -> DataCategory:
+        if not hasattr(cls, "Config") or not hasattr(cls.Config, "category"):
+            raise ImproperlyConfigured(
+                "The class should define a Config class with"
+                "the 'category' property that reflects the collection's data category."
+            )
+
+        return cls.Config.category
+
+    @classmethod
+    def create_collection(cls: Type[T]) -> bool:
+        collection_name = cls.get_collection_name()
+        use_vector_index = cls.get_use_vector_index()
+
+        return cls._create_collection(collection_name=collection_name, use_vector_index=use_vector_index)
+
+    @classmethod
+    def _create_collection(cls, collection_name: str, use_vector_index: bool = True) -> bool:
+        if use_vector_index is True:
+            vectors_config = VectorParams(size=EmbeddingModelSingleton().embedding_size, distance=Distance.COSINE)
+        else:
+            vectors_config = {}
+        return connection.create_collection(collection_name=collection_name, vectors_config=vectors_config)
+    
+    @classmethod
+    def get_use_vector_index(cls: Type[T]) -> bool:
+        if not hasattr(cls, "Config") or not hasattr(cls.Config, "use_vector_index"):
+            return True
+
+        return cls.Config.use_vector_index
