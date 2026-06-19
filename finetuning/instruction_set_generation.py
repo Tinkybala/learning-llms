@@ -1,8 +1,8 @@
 import concurrent.futures
-import datetime
 import json
 import os
 import re
+from datetime import datetime
 from typing import List, Tuple
 
 from datasets import Dataset
@@ -108,7 +108,7 @@ def generate_instruction_answer_pairs(extract: str, client: OpenAI) -> List[Tupl
 
 
 def create_instruction_dataset(
-        dataset: Dataset, client: OpenAI, num_workers: int = 4
+        dataset: Dataset, client: OpenAI, num_workers: int = 8
 ) -> Dataset:
     extracts = extract_substrings(dataset)
     instruction_answer_pairs = []
@@ -117,7 +117,10 @@ def create_instruction_dataset(
         futures = [executor.submit(generate_instruction_answer_pairs, extract, client)
                    for extract in extracts]
         for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
-            instruction_answer_pairs.extend(future.result())
+            try:
+                instruction_answer_pairs.extend(future.result())
+            except Exception as e:
+                print(f"\nSkipping extract due to error: {e}")
         
     instructions, answers = zip(*instruction_answer_pairs)
     return Dataset.from_dict(
