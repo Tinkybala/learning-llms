@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     COMET_API_KEY: str | None = None
     COMET_PROJECT: str = "twin"
 
+    # WANDB (during training)
+    WANDB_PROJECT = "LLM Twin"
+
     # --- Required settings when deploying the code. ---
     # --- Otherwise, default values values work fine. ---
 

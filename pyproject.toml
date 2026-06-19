@@ -21,6 +21,7 @@ run_feature_engineering = "python -m data_engineering.pipelines.run --run-featur
 sequence = ["format", "lint"]
 
 
+
 [dependency-groups]
 dev = [
     "bs4>=0.0.2",
@@ -39,5 +40,6 @@ dev = [
     "selenium>=4.44.0",
     "sentence-transformers>=5.5.1",
     "tqdm>=4.67.3",
+    "trl>=0.23.0",
 ]
 
