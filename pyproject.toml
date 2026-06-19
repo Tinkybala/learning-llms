@@ -39,5 +39,6 @@ dev = [
     "selenium>=4.44.0",
     "sentence-transformers>=5.5.1",
     "tqdm>=4.67.3",
+    "unsloth>=2025.11.1",
 ]
 
