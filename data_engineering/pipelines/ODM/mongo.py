@@ -3,7 +3,7 @@ import logging
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
-from data_engineering.settings import settings
+from settings import settings
 
 logging.basicConfig(level=logging.INFO)
 

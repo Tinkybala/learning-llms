@@ -8,7 +8,7 @@ from pymongo import errors
 
 from data_engineering.exceptions import ImproperlyConfigured
 from data_engineering.pipelines.ODM.mongo import connection
-from data_engineering.settings import settings
+from settings import settings
 
 logging.basicConfig(level=logging.INFO)
 

@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str | None = None
 
     # Huggingface API
+    HF_TOKEN: str | None = None
     HUGGINGFACE_ACCESS_TOKEN: str | None = None
 
     # Comet ML (during training)
