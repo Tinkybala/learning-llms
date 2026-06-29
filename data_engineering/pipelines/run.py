@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from data_engineering.pipelines.etl import etl_pipeline
+from data_engineering.pipelines import etl_pipeline, feature_engineering_pipeline
 
 
 @click.command(
@@ -35,11 +35,18 @@ Examples:
     default=False,
     help="Whether to run the ETL pipeline.",
 )
+@click.option(
+    "--run-feature-engineering",
+    is_flag=True,
+    default=False,
+    help="Whether to run FE pipeline",
+)
 def main(
     run_etl: bool = False,
+    run_feature_engineering: bool = False,
     etl_config_filename: str = "digital_data_etl_lilian_weng.yaml",
 ) -> None:
-    assert run_etl, "Please specify action to run"
+    assert run_etl or run_feature_engineering, "Please specify action to run"
 
     pipeline_args = {}
 
@@ -55,6 +62,15 @@ def main(
             f"digital_data_etl_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
         )
         etl_pipeline.with_options(**pipeline_args)(**run_args_etl)
+
+    if run_feature_engineering:
+        run_args_fe = {}
+        pipeline_args["config_path"] = root_dir / "config" / "feature_engineering.yaml"
+        pipeline_args["run_name"] = (
+            f"feature_engineering_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+        )
+        feature_engineering_pipeline.with_options(**pipeline_args)(**run_args_fe)
+
 
 if __name__ == "__main__":
     main()
