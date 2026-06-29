@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     COMET_PROJECT: str = "twin"
 
     # WANDB (during training)
-    WANDB_PROJECT = "LLM Twin"
+    WANDB_PROJECT: str = "LLM Twin"
 
     # --- Required settings when deploying the code. ---
     # --- Otherwise, default values values work fine. ---

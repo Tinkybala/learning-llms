@@ -3,8 +3,6 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 from uuid import UUID
 
-from feature_engineering.utils import chunk_article, chunk_text
-
 from data_engineering.feature_engineering.chunks import (
     Chunk,
     CustomArticleChunk,
@@ -15,6 +13,7 @@ from data_engineering.feature_engineering.cleaned_document import (
     CleanedDocument,
     CleanedRepositoryDocument,
 )
+from data_engineering.feature_engineering.utils import chunk_article, chunk_text
 
 CleanedDocumentT = TypeVar("CleanedDocumentT", bound=CleanedDocument)
 ChunkT = TypeVar("ChunkT", bound=Chunk)

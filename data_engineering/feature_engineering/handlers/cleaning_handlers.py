@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from feature_engineering.utils import clean_text
-
 from data_engineering.feature_engineering.cleaned_document import (
     CleanedCustomArticleDocument,
     CleanedDocument,
     CleanedRepositoryDocument,
 )
+from data_engineering.feature_engineering.utils import clean_text
 from data_engineering.pipelines.ODM.documents import (
     CustomArticleDocument,
     Document,
