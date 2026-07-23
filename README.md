@@ -39,5 +39,8 @@ python finetuning/finetuning_sft.py --qlora --dataset1 "TInkybala/llmtwin_instru
 poe test_query_expansion
 
 # To test self-query (asking an llm to extract metadata to apply hard constraint filters on the db before doing search)
+poe test_self_query
 
+# To test the Cross-Encoder model
+poe test_cross_encoder
 ```

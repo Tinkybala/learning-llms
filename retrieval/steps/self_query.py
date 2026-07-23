@@ -23,7 +23,7 @@ OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
 class SelfQuery(RAGStep):
     def generate(self, query: Query) -> Query:
         if self._mock:
-            logging.info("Running mock self query")
+            logging.info("Self Query: Running in mock")
             query.author_id = "mock_id"
             query.author_full_name = "mock_username"
             return query
