@@ -35,8 +35,9 @@ python finetuning/finetuning_sft.py --qlora --dataset1 "TInkybala/llmtwin_instru
 
 ## Retrieval Steps
 ```
-# To test query expansion
+# To test query expansion (creating multiple rag queries to cover a larger search space)
 poe test_query_expansion
 
+# To test self-query (asking an llm to extract metadata to apply hard constraint filters on the db before doing search)
 
 ```

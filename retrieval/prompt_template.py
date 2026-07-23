@@ -1,7 +1,7 @@
 from langchain_core.prompts import PromptTemplate
 
 from retrieval.interface import PromptTemplateFactory
-from retrieval.prompts import QUERY_EXPANSION_PROMPT
+from retrieval.prompts import QUERY_EXPANSION_PROMPT, SELF_QUERY_PROMPT
 
 
 class QueryExpansionTemplate(PromptTemplateFactory):
@@ -21,3 +21,10 @@ class QueryExpansionTemplate(PromptTemplateFactory):
                 "expand_to_n": expand_to_n,
             }
         )
+    
+class SelfQueryTemplate(PromptTemplateFactory):
+
+    prompt: str = SELF_QUERY_PROMPT
+
+    def create_template(self):
+        return PromptTemplate(template=self.prompt, input_variables=["question"])
