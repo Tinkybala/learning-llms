@@ -32,3 +32,11 @@ python finetuning/instruction_set_generation.py
 # To run SFT training (see the file for more options)
 python finetuning/finetuning_sft.py --qlora --dataset1 "TInkybala/llmtwin_instruction_20260619_112900" --epochs 3 --hub_model_id "TInkybala/llama-3.1-8b-finetune-test"
 ```
+
+## Retrieval Steps
+```
+# To test query expansion
+poe test_query_expansion
+
+
+```
