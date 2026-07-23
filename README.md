@@ -41,6 +41,6 @@ poe test_query_expansion
 # To test self-query (asking an llm to extract metadata to apply hard constraint filters on the db before doing search)
 poe test_self_query
 
-# To test the Cross-Encoder model
+# To test the Cross-Encoder model (a neural network that takes in both query and reference document as inputs and outputs a similarity/relevance score is used to re-rank. More computationally expensive as cannot pre-compute reference document vectors RAG Bi-Encoder style but is higher quality)
 poe test_cross_encoder
 ```
