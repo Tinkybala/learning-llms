@@ -20,4 +20,3 @@ class RAGStep(ABC):
     @abstractmethod
     def generate(self, query: Query, *args, **kwargs) -> Any:
         pass
-

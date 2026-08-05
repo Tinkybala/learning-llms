@@ -5,7 +5,9 @@ from langchain_text_splitters import (
     SentenceTransformersTokenTextSplitter,
 )
 
-embedding_model = None
+from models.embedding import EmbeddingModelSingleton
+
+embedding_model = EmbeddingModelSingleton()
 
 
 def clean_text(text: str) -> str:
@@ -33,6 +35,8 @@ def chunk_text(text: str, chunk_size: int = 500, chunk_overlap: int = 50) -> lis
     chunks_by_tokens = []
     for section in text_split_by_characters:
         chunks_by_tokens.extend(token_splitter.split_text(section))
+
+    return chunks_by_tokens
 
 
 def chunk_article(text: str, min_length: int, max_length: int) -> list[str]:

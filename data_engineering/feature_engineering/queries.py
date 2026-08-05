@@ -11,7 +11,7 @@ class Query(VectorBaseDocument):
     metadata: dict = Field(default_factory=dict)
 
     class Config:
-        category: DataCategory.QUERIES
+        category = DataCategory.QUERIES
 
     @classmethod
     def from_str(cls, query: str) -> "Query":

@@ -20,5 +20,6 @@ def split_user_full_name(user: str | None) -> tuple[str, str]:
 
 def batch(documents: list, batch_size: int) -> Generator[list, None, None]:
     """Embed chunks in batches"""
-    yield from (documents[i : i + batch_size] for i in range(0, len(documents), batch_size))
-    
+    yield from (
+        documents[i : i + batch_size] for i in range(0, len(documents), batch_size)
+    )

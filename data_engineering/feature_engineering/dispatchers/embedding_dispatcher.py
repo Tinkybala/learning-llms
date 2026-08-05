@@ -52,7 +52,7 @@ class EmbeddingDispatcher:
 
         logging.info(
             "Data embedded successfully.",
-            #data_category=data_category,
+            # data_category=data_category,
         )
 
         return embedded_chunk_model
