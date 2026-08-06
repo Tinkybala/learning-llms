@@ -43,4 +43,7 @@ poe test_self_query
 
 # To test the Cross-Encoder model (a neural network that takes in both query and reference document as inputs and outputs a similarity/relevance score is used to re-rank. More computationally expensive as cannot pre-compute reference document vectors RAG Bi-Encoder style but is higher quality)
 poe test_cross_encoder
+
+# To test entire retrieval pipeline
+poe test_retrieval
 ```
