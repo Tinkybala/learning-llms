@@ -1,5 +1,8 @@
-from data_engineering.feature_engineering.dispatchers.cleaning_dispatcher import CleaningDispatcher
 from typing_extensions import Annotated
+
+from data_engineering.feature_engineering.dispatchers.cleaning_dispatcher import (
+    CleaningDispatcher,
+)
 
 
 def clean_documents(

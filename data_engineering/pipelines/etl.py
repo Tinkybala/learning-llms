@@ -18,7 +18,7 @@ def pipeline(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         return fn(*args, **kwargs)
-    
+
     def with_options(**pipeline_args):
         config_path = pipeline_args.get("config_path")
         params = {}
@@ -31,15 +31,15 @@ def pipeline(fn):
             merged = {**params, **run_args}  # run_args override YAML
             print(f"[{pipeline_args.get('run_name')}] Starting pipeline...")
             return fn(**merged)
-        
+
         return configured_run
-    
+
     wrapper.with_options = with_options
     return wrapper
+
 
 @pipeline
 def etl_pipeline(user_full_name: str, links: list[str]) -> None:
     user = get_or_create_user(user_full_name)
     crawl_links(user=user, links=links)
     return
-

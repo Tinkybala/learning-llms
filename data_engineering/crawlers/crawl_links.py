@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 def crawl_links(user: UserDocument, links: list[str]):
     logging.info(f"Starting to crawl {len(links)} link(s)")
-    dispatcher = CrawlerDispatcher()
+    dispatcher = CrawlerDispatcher().register_github()
 
     # metadata = {}
     successful_crawls = 0

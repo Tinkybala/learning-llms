@@ -36,10 +36,10 @@ class CrawlerDispatcher:
         self._crawlers[domain] = crawler
 
     def get_crawler(self, url: str) -> BaseCrawler:
-        for netloc, crawler in self._crawlers:
-            if netloc in str:
-                return crawler
-        
+        for netloc, crawler in self._crawlers.items():
+            if netloc in url:
+                return crawler()
+
         # If no registered crawlers available for url
         logging.warning(
             f"No crawler found for {url}. Defaulting to CustomArticleCrawler."

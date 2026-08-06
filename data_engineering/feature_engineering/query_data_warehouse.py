@@ -41,9 +41,9 @@ def query_data_warehouse(
 def fetch_all_data(user: UserDocument) -> dict[str, list[NoSQLBaseDocument]]:
     user_id = str(user.id)
     with ThreadPoolExecutor() as executor:
-        futures ={
+        futures = {
             executor.submit(__fetch_articles, user_id): "articles",
-            #executor.submit(__fetch_posts, user_id): "posts",
+            # executor.submit(__fetch_posts, user_id): "posts",
             executor.submit(__fetch_repositories, user_id): "repositories",
         }
 
@@ -60,8 +60,9 @@ def fetch_all_data(user: UserDocument) -> dict[str, list[NoSQLBaseDocument]]:
             except Exception:
                 logging.exception(f"'{query_name}' fetch request failed")
                 results[query_name] = []
-        
+
         return results
+
 
 def __fetch_articles(user_id) -> list[NoSQLBaseDocument]:
     return CustomArticleDocument.bulk_find(author_id=user_id)

@@ -34,14 +34,18 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
         return hash(self.id)
 
     @classmethod
+    def _has_class_attribute(cls: Type[T], attribute_name: str) -> bool:
+        return attribute_name in cls.model_fields
+
+    @classmethod
     def from_record(cls: Type[T], point: Record) -> T:
         _id = UUID(point.id, version=4)
         payload = point.payload or {}
 
-        attributes = {"id": _id**payload}
-
         if cls._has_class_attribute("embedding"):
             payload["embedding"] = point.vector or None
+
+        attributes = {"id": _id, **payload}
 
         return cls(**attributes)
 
@@ -57,11 +61,15 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
         return PointStruct(id=_id, vector=vector, payload=payload)
 
     @classmethod
-    def group_by_class(cls: Type["VectorBaseDocument"], documents: list["VectorBaseDocument"]) -> Dict["VectorBaseDocument", list["VectorBaseDocument"]]:
+    def group_by_class(
+        cls: Type["VectorBaseDocument"], documents: list["VectorBaseDocument"]
+    ) -> Dict["VectorBaseDocument", list["VectorBaseDocument"]]:
         return cls._group_by(documents, selector=lambda doc: doc.__class__)
-    
+
     @classmethod
-    def _group_by(cls: Type[T], documents: list[T], selector: Callable[[T], Any]) -> Dict[Any, list[T]]:
+    def _group_by(
+        cls: Type[T], documents: list[T], selector: Callable[[T], Any]
+    ) -> Dict[Any, list[T]]:
         grouped = {}
         for doc in documents:
             key = selector(doc)
@@ -148,15 +156,15 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
     @classmethod
     def _search(cls: Type[T], query_vector: list, limit: int = 10, **kwargs) -> list[T]:
         collection_name = cls.get_collection_name()
-        records = connection.search(
+        response = connection.query_points(
             collection_name=collection_name,
-            query_vector=query_vector,
+            query=query_vector,
             limit=limit,
             with_payload=kwargs.pop("with_payload", True),
             with_vectors=kwargs.pop("with_vectors", False),
             **kwargs,
         )
-        documents = [cls.from_record(record) for record in records]
+        documents = [cls.from_record(record) for record in response.points]
         return documents
 
     @classmethod
@@ -171,7 +179,7 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
     def get_category(cls: Type[T]) -> DataCategory:
         if not hasattr(cls, "Config") or not hasattr(cls.Config, "category"):
             raise ImproperlyConfigured(
-                "The class should define a Config class with"
+                "The class should define a Config class with "
                 "the 'category' property that reflects the collection's data category."
             )
 
@@ -182,16 +190,24 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
         collection_name = cls.get_collection_name()
         use_vector_index = cls.get_use_vector_index()
 
-        return cls._create_collection(collection_name=collection_name, use_vector_index=use_vector_index)
+        return cls._create_collection(
+            collection_name=collection_name, use_vector_index=use_vector_index
+        )
 
     @classmethod
-    def _create_collection(cls, collection_name: str, use_vector_index: bool = True) -> bool:
+    def _create_collection(
+        cls, collection_name: str, use_vector_index: bool = True
+    ) -> bool:
         if use_vector_index is True:
-            vectors_config = VectorParams(size=EmbeddingModelSingleton().embedding_size, distance=Distance.COSINE)
+            vectors_config = VectorParams(
+                size=EmbeddingModelSingleton().embedding_size, distance=Distance.COSINE
+            )
         else:
             vectors_config = {}
-        return connection.create_collection(collection_name=collection_name, vectors_config=vectors_config)
-    
+        return connection.create_collection(
+            collection_name=collection_name, vectors_config=vectors_config
+        )
+
     @classmethod
     def get_use_vector_index(cls: Type[T]) -> bool:
         if not hasattr(cls, "Config") or not hasattr(cls.Config, "use_vector_index"):
